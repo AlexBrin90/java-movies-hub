@@ -9,7 +9,9 @@ public class ErrorResponse {
 
     public ErrorResponse() {
     }
+
 // Вадим, спасибо))))
+
     public ErrorResponse(String error, List<String> details) {
         this.error = error;
         this.details = details;

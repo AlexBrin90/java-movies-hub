@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MoviesHandler extends BaseHttpHandler {
+
     private MoviesStore store;
 
     public MoviesHandler(MoviesStore store) {

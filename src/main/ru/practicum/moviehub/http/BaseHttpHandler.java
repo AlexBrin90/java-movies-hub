@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public abstract class BaseHttpHandler implements HttpHandler {
+
     protected static final String JSON_TYPE = "application/json; charset=UTF-8";
     protected static final Gson gson = new Gson();
 
