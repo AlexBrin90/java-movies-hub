@@ -1,11 +1,8 @@
 package ru.practicum.moviehub.http;
 
-
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import ru.practicum.moviehub.model.Movie;
 import ru.practicum.moviehub.store.MoviesStore;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -13,13 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MoviesHandler extends BaseHttpHandler {
-
     private MoviesStore store;
-    private Gson gson;
 
     public MoviesHandler(MoviesStore store) {
         this.store = store;
-        this.gson = new Gson();
     }
 
     @Override
@@ -50,7 +44,7 @@ public class MoviesHandler extends BaseHttpHandler {
             try {
                 int year = Integer.parseInt(query.replace("year=", ""));
                 List<Movie> list = store.getMoviesByYear(year);
-                sendJson(ex, 200, gson.toJson(list));
+                sendJson(ex, 200, list);
             } catch (NumberFormatException e) {
                 sendError(ex, 400, "Некорректный параметр запроса — 'year'");
             }
@@ -62,7 +56,7 @@ public class MoviesHandler extends BaseHttpHandler {
                 int id = Integer.parseInt(path.replace("/movies/", ""));
                 Movie movie = store.getMovieById(id);
                 if (movie != null) {
-                    sendJson(ex, 200, gson.toJson(movie));
+                    sendJson(ex, 200, movie);
                 } else {
                     sendError(ex, 404, "Фильм не найден");
                 }
@@ -73,12 +67,11 @@ public class MoviesHandler extends BaseHttpHandler {
         }
 
         List<Movie> all = store.getAllMovies();
-        sendJson(ex, 200, gson.toJson(all));
+        sendJson(ex, 200, all);
     }
 
     private void handlePost(HttpExchange ex) throws IOException {
         String ct = ex.getRequestHeaders().getFirst("Content-Type");
-
         if (ct == null || !ct.contains("application/json")) {
             sendError(ex, 415, "Unsupported Media Type");
             return;
@@ -98,9 +91,7 @@ public class MoviesHandler extends BaseHttpHandler {
             } else if (title.length() > 100) {
                 errors.add("название не должно превышать 100 символов");
             }
-
             int curYear = java.time.Year.now().getValue();
-
             if (year < 1888 || year > curYear + 1) {
                 errors.add("год должен быть между 1888 и " + (curYear + 1));
             }
@@ -112,7 +103,7 @@ public class MoviesHandler extends BaseHttpHandler {
 
             Movie m = new Movie(title, year);
             store.addMovie(m);
-            sendJson(ex, 201, gson.toJson(m));
+            sendJson(ex, 201, m);
         } catch (Exception e) {
             sendError(ex, 400, "Некорректный JSON");
         }
@@ -121,13 +112,11 @@ public class MoviesHandler extends BaseHttpHandler {
     private void handleDelete(HttpExchange ex, String path) throws IOException {
         try {
             int id = Integer.parseInt(path.replace("/movies/", ""));
-
             if (store.deleteMovie(id)) {
                 sendNoContent(ex);
             } else {
                 sendError(ex, 404, "Фильм не найден");
             }
-
         } catch (NumberFormatException e) {
             sendError(ex, 400, "Некорректный ID");
         }
